@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memo</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 16px;
+    background: #fafafa;
+    color: #222;
+  }
+  h1 { font-size: 1.3rem; }
+  textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    resize: vertical;
+  }
+  .row { display: flex; gap: 8px; margin: 8px 0; }
+  input[type="search"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #4a7;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  button.del {
+    background: #e55;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+  ul { list-style: none; padding: 0; }
+  li {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .memo-text { white-space: pre-wrap; word-break: break-word; flex: 1; }
+  .memo-date { font-size: 0.7rem; color: #999; display: block; margin-top: 4px; }
+  .empty { color: #999; text-align: center; padding: 24px; }
+</style>
+</head>
+<body>
+  <h1>📝 Memo</h1>
+
+  <textarea id="input" placeholder="思いつきを書く…"></textarea>
+  <div class="row">
+    <button id="add">追加</button>
+  </div>
+
+  <div class="row">
+    <input type="search" id="search" placeholder="検索…">
+  </div>
+
+  <ul id="list"></ul>
+
+<script>
+  const KEY = "memos_v1";
+  const inputEl = document.getElementById("input");
+  const listEl = document.getElementById("list");
+  const searchEl = document.getElementById("search");
+
+  let memos = JSON.parse(localStorage.getItem(KEY) || "[]");
+
+  function save() {
+    localStorage.setItem(KEY, JSON.stringify(memos));
+  }
+
+  function render() {
+    const q = searchEl.value.trim().toLowerCase();
+    const shown = memos.filter(m => m.text.toLowerCase().includes(q));
+    listEl.innerHTML = "";
+    if (shown.length === 0) {
+      listEl.innerHTML = '<li class="empty">メモなし</li>';
+      return;
+    }
+    shown.forEach(m => {
+      const li = document.createElement("li");
+      const wrap = document.createElement("div");
+      wrap.className = "memo-text";
+      wrap.textContent = m.text;
+      const date = document.createElement("span");
+      date.className = "memo-date";
+      date.textContent = new Date(m.id).toLocaleString("ja-JP");
+      wrap.appendChild(date);
+      const btn = document.createElement("button");
+      btn.className = "del";
+      btn.textContent = "削除";
+      btn.onclick = () => {
+        memos = memos.filter(x => x.id !== m.id);
+        save();
+        render();
+      };
+      li.appendChild(wrap);
+      li.appendChild(btn);
+      listEl.appendChild(li);
+    });
+  }
+
+  function add() {
+    const text = inputEl.value.trim();
+    if (!text) return;
+    memos.unshift({ id: Date.now(), text });
+    inputEl.value = "";
+    save();
+    render();
+  }
+
+  document.getElementById("add").onclick = add;
+  searchEl.oninput = render;
+
+  // Ctrl+Enter で追加
+  inputEl.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") add();
+  });
+
+  render();
+</script>
+</body>
+</html>
