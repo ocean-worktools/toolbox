@@ -1,249 +1,308 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Memo</title>
-<style>
-  * { box-sizing: border-box; }
-  body {
-    font-family: system-ui, sans-serif;
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 16px;
-    background: #fafafa;
-    color: #222;
-  }
-  h1 { font-size: 1.3rem; }
-  textarea {
-    width: 100%;
-    min-height: 80px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-    resize: vertical;
-  }
-  .hint { font-size: 0.75rem; color: #999; margin: 4px 2px; }
-  .row { display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap; }
-  input[type="search"] {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-  }
-  button {
-    padding: 10px 16px;
-    border: none;
-    border-radius: 8px;
-    background: #4a7;
-    color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-  }
-  button.del { background: #e55; padding: 6px 10px; font-size: 0.85rem; }
-  button.edit { background: #59c; padding: 6px 10px; font-size: 0.85rem; }
-  button.sub { background: #888; font-size: 0.85rem; }
-  ul { list-style: none; padding: 0; }
-  li {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  .memo-text { white-space: pre-wrap; word-break: break-word; flex: 1; }
-  .memo-date { font-size: 0.7rem; color: #999; display: block; margin-top: 4px; }
-  .btns { display: flex; flex-direction: column; gap: 4px; }
-  .empty { color: #999; text-align: center; padding: 24px; }
-  .edit-area {
-    flex: 1;
-    min-height: 60px;
-    padding: 8px;
-    border: 1px solid #59c;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-family: inherit;
-    resize: vertical;
-  }
-</style>
-</head>
-<body>
-  <h1>📝 Memo</h1>
-
-  <textarea id="input" placeholder="思いつきを書く…"></textarea>
-  <div class="hint">💡 Ctrl+Enter（Mac は ⌘+Enter）で保存できるよ</div>
-  <div class="row">
-    <button id="add">追加</button>
-  </div>
-
-  <div class="row">
-    <input type="search" id="search" placeholder="検索…">
-  </div>
-
-  <div class="row">
-    <button class="sub" id="export">📤 エクスポート</button>
-    <button class="sub" id="importBtn">📥 インポート</button>
-    <input type="file" id="importFile" accept="application/json" hidden>
-  </div>
-
-  <ul id="list"></ul>
-
-<script>
-  const KEY = "memos_v1";
-  const inputEl = document.getElementById("input");
-  const listEl = document.getElementById("list");
-  const searchEl = document.getElementById("search");
-
-  let memos = JSON.parse(localStorage.getItem(KEY) || "[]");
-  let editingId = null;
-
-  function save() {
-    localStorage.setItem(KEY, JSON.stringify(memos));
-  }
-
-  function render() {
-    const q = searchEl.value.trim().toLowerCase();
-    const shown = memos.filter(m => m.text.toLowerCase().includes(q));
-    listEl.innerHTML = "";
-    if (shown.length === 0) {
-      listEl.innerHTML = '<li class="empty">メモなし</li>';
-      return;
-    }
-    shown.forEach(m => {
-      const li = document.createElement("li");
-
-      if (editingId === m.id) {
-        // 編集モード
-        const ta = document.createElement("textarea");
-        ta.className = "edit-area";
-        ta.value = m.text;
-        const btns = document.createElement("div");
-        btns.className = "btns";
-        const saveBtn = document.createElement("button");
-        saveBtn.className = "edit";
-        saveBtn.textContent = "保存";
-        saveBtn.onclick = () => {
-          const v = ta.value.trim();
-            if (v) { m.text = v; m.edited = Date.now(); save(); }
-          editingId = null;
-          render();
-        };
-        const cancelBtn = document.createElement("button");
-        cancelBtn.className = "del";
-        cancelBtn.textContent = "中止";
-        cancelBtn.onclick = () => { editingId = null; render(); };
-        // 編集中も Ctrl+Enter で保存
-        ta.addEventListener("keydown", e => {
-          if ((e.ctrlKey || e.metaKey) && e.key === "Enter") saveBtn.click();
-        });
-        btns.appendChild(saveBtn);
-        btns.appendChild(cancelBtn);
-        li.appendChild(ta);
-        li.appendChild(btns);
-      } else {
-        // 通常表示
-        const wrap = document.createElement("div");
-        wrap.className = "memo-text";
-        wrap.textContent = m.text;
-        const date = document.createElement("span");
-        date.className = "memo-date";
-        const stamp = m.edited ? "編集 " + new Date(m.edited).toLocaleString("ja-JP")
-                               : new Date(m.id).toLocaleString("ja-JP");
-        date.textContent = stamp;
-        wrap.appendChild(date);
-
-        const btns = document.createElement("div");
-        btns.className = "btns";
-        const editBtn = document.createElement("button");
-        editBtn.className = "edit";
-        editBtn.textContent = "編集";
-        editBtn.onclick = () => { editingId = m.id; render(); };
-        const delBtn = document.createElement("button");
-        delBtn.className = "del";
-        delBtn.textContent = "削除";
-        delBtn.onclick = () => {
-          memos = memos.filter(x => x.id !== m.id);
-          save();
-          render();
-        };
-        btns.appendChild(editBtn);
-        btns.appendChild(delBtn);
-        li.appendChild(wrap);
-        li.appendChild(btns);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memo</title>
+    <style>
+      * {
+        box-sizing: border-box;
       }
-      listEl.appendChild(li);
-    });
-  }
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 16px;
+        background: #fafafa;
+        color: #222;
+      }
+      h1 {
+        font-size: 1.3rem;
+      }
+      textarea {
+        width: 100%;
+        min-height: 80px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+        resize: vertical;
+      }
+      .hint {
+        font-size: 0.75rem;
+        color: #999;
+        margin: 4px 2px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        margin: 8px 0;
+        flex-wrap: wrap;
+      }
+      input[type="search"] {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+      }
+      button {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        background: #4a7;
+        color: #fff;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+      button.del {
+        background: #e55;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+      }
+      button.edit {
+        background: #59c;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+      }
+      button.sub {
+        background: #888;
+        font-size: 0.85rem;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .memo-text {
+        white-space: pre-wrap;
+        word-break: break-word;
+        flex: 1;
+      }
+      .memo-date {
+        font-size: 0.7rem;
+        color: #999;
+        display: block;
+        margin-top: 4px;
+      }
+      .btns {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .empty {
+        color: #999;
+        text-align: center;
+        padding: 24px;
+      }
+      .edit-area {
+        flex: 1;
+        min-height: 60px;
+        padding: 8px;
+        border: 1px solid #59c;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-family: inherit;
+        resize: vertical;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📝 Memo</h1>
 
-  function add() {
-    const text = inputEl.value.trim();
-    if (!text) return;
-    memos.unshift({ id: Date.now(), text });
-    inputEl.value = "";
-    save();
-    render();
-  }
+    <textarea id="input" placeholder="思いつきを書く…"></textarea>
+    <div class="hint">💡 Ctrl+Enter（Mac は ⌘+Enter）で保存できるよ</div>
+    <div class="row">
+      <button id="add">追加</button>
+    </div>
 
-  // 編集時にidを保存に書き換えるので edited フラグ付与
-  function markEdited(m) { m.edited = Date.now(); }
+    <div class="row">
+      <input type="search" id="search" placeholder="検索…" />
+    </div>
 
-  document.getElementById("add").onclick = add;
-  searchEl.oninput = render;
+    <div class="row">
+      <button class="sub" id="export">📤 エクスポート</button>
+      <button class="sub" id="importBtn">📥 インポート</button>
+      <input type="file" id="importFile" accept="application/json" hidden />
+    </div>
 
-  inputEl.addEventListener("keydown", e => {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") add();
-  });
+    <ul id="list"></ul>
 
-  // エクスポート
-  document.getElementById("export").onclick = () => {
-    const blob = new Blob([JSON.stringify(memos, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    const d = new Date().toISOString().slice(0, 10);
-    a.href = url;
-    a.download = `memo-backup-${d}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+    <script>
+      const KEY = "memos_v1";
+      const inputEl = document.getElementById("input");
+      const listEl = document.getElementById("list");
+      const searchEl = document.getElementById("search");
 
-  // インポート
-  const importFile = document.getElementById("importFile");
-  document.getElementById("importBtn").onclick = () => importFile.click();
-  importFile.onchange = () => {
-    const file = importFile.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const data = JSON.parse(reader.result);
-        if (!Array.isArray(data)) throw new Error("形式が不正");
-        const mode = confirm("OK＝今のメモに追加 / キャンセル＝全部置き換え");
-        if (mode) {
-          // 重複id回避しつつ追加
-          const ids = new Set(memos.map(m => m.id));
-          data.forEach(m => { if (!ids.has(m.id)) memos.push(m); });
-          memos.sort((a, b) => b.id - a.id);
-        } else {
-          memos = data;
+      let memos = JSON.parse(localStorage.getItem(KEY) || "[]");
+      let editingId = null;
+
+      function save() {
+        localStorage.setItem(KEY, JSON.stringify(memos));
+      }
+
+      function render() {
+        const q = searchEl.value.trim().toLowerCase();
+        const shown = memos.filter((m) => m.text.toLowerCase().includes(q));
+        listEl.innerHTML = "";
+        if (shown.length === 0) {
+          listEl.innerHTML = '<li class="empty">メモなし</li>';
+          return;
         }
+        shown.forEach((m) => {
+          const li = document.createElement("li");
+
+          if (editingId === m.id) {
+            // 編集モード
+            const ta = document.createElement("textarea");
+            ta.className = "edit-area";
+            ta.value = m.text;
+            const btns = document.createElement("div");
+            btns.className = "btns";
+            const saveBtn = document.createElement("button");
+            saveBtn.className = "edit";
+            saveBtn.textContent = "保存";
+            saveBtn.onclick = () => {
+              const v = ta.value.trim();
+              if (v) {
+                m.text = v;
+                m.edited = Date.now();
+                save();
+              }
+              editingId = null;
+              render();
+            };
+            const cancelBtn = document.createElement("button");
+            cancelBtn.className = "del";
+            cancelBtn.textContent = "中止";
+            cancelBtn.onclick = () => {
+              editingId = null;
+              render();
+            };
+            // 編集中も Ctrl+Enter で保存
+            ta.addEventListener("keydown", (e) => {
+              if ((e.ctrlKey || e.metaKey) && e.key === "Enter")
+                saveBtn.click();
+            });
+            btns.appendChild(saveBtn);
+            btns.appendChild(cancelBtn);
+            li.appendChild(ta);
+            li.appendChild(btns);
+          } else {
+            // 通常表示
+            const wrap = document.createElement("div");
+            wrap.className = "memo-text";
+            wrap.textContent = m.text;
+            const date = document.createElement("span");
+            date.className = "memo-date";
+            const stamp = m.edited
+              ? "編集 " + new Date(m.edited).toLocaleString("ja-JP")
+              : new Date(m.id).toLocaleString("ja-JP");
+            date.textContent = stamp;
+            wrap.appendChild(date);
+
+            const btns = document.createElement("div");
+            btns.className = "btns";
+            const editBtn = document.createElement("button");
+            editBtn.className = "edit";
+            editBtn.textContent = "編集";
+            editBtn.onclick = () => {
+              editingId = m.id;
+              render();
+            };
+            const delBtn = document.createElement("button");
+            delBtn.className = "del";
+            delBtn.textContent = "削除";
+            delBtn.onclick = () => {
+              memos = memos.filter((x) => x.id !== m.id);
+              save();
+              render();
+            };
+            btns.appendChild(editBtn);
+            btns.appendChild(delBtn);
+            li.appendChild(wrap);
+            li.appendChild(btns);
+          }
+          listEl.appendChild(li);
+        });
+      }
+
+      function add() {
+        const text = inputEl.value.trim();
+        if (!text) return;
+        memos.unshift({ id: Date.now(), text });
+        inputEl.value = "";
         save();
         render();
-        alert("インポート完了");
-      } catch (err) {
-        alert("読み込み失敗: " + err.message);
       }
-    };
-    reader.readAsText(file);
-    importFile.value = "";
-  };
 
-  render();
-</script>
-</body>
+      document.getElementById("add").onclick = add;
+      searchEl.oninput = render;
+
+      inputEl.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") add();
+      });
+
+      // エクスポート
+      document.getElementById("export").onclick = () => {
+        const blob = new Blob([JSON.stringify(memos, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const d = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `memo-backup-${d}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      // インポート
+      const importFile = document.getElementById("importFile");
+      document.getElementById("importBtn").onclick = () => importFile.click();
+      importFile.onchange = () => {
+        const file = importFile.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            if (!Array.isArray(data)) throw new Error("形式が不正");
+            const mode = confirm(
+              "OK＝今のメモに追加 / キャンセル＝全部置き換え",
+            );
+            if (mode) {
+              // 重複id回避しつつ追加
+              const ids = new Set(memos.map((m) => m.id));
+              data.forEach((m) => {
+                if (!ids.has(m.id)) memos.push(m);
+              });
+              memos.sort((a, b) => b.id - a.id);
+            } else {
+              memos = data;
+            }
+            save();
+            render();
+            alert("インポート完了");
+          } catch (err) {
+            alert("読み込み失敗: " + err.message);
+          }
+        };
+        reader.readAsText(file);
+        importFile.value = "";
+      };
+
+      render();
+    </script>
+  </body>
 </html>
