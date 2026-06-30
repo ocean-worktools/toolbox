@@ -42,6 +42,15 @@
       .btn.red {
         background: #c0392b;
       }
+      /* ヘッダー（青地）の上に置くボタン用：半透明の白枠で青地に馴染ませる */
+      .btn.header {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+      }
+      .btn.header:hover {
+        background: rgba(255, 255, 255, 0.28);
+      }
       .btn.small {
         padding: 4px 10px;
         font-size: 13px;
@@ -215,7 +224,29 @@
     </style>
   </head>
   <body>
-    <header>授業進行管理</header>
+    <!-- ヘッダー：タイトル左、データ操作ボタンを右端に配置 -->
+    <header
+      style="display: flex; justify-content: space-between; align-items: center"
+    >
+      <span>授業進行管理</span>
+      <span>
+        <button class="btn small header" onclick="exportData()">
+          データ書き出し
+        </button>
+        <button
+          class="btn small header"
+          onclick="document.getElementById('importFile').click()"
+        >
+          データ読み込み
+        </button>
+        <input
+          type="file"
+          id="importFile"
+          style="display: none"
+          onchange="importData(event)"
+        />
+      </span>
+    </header>
     <div class="wrap" id="app"></div>
 
     <script>
@@ -388,16 +419,9 @@
 
       // --- トップ画面：上＝テキスト一覧 / 下＝生徒一覧 ---
       function renderTop() {
-        // 上半分：テキスト一覧
+        // 上半分：テキスト一覧（データ操作ボタンはヘッダーへ移動済み）
         let html = `<div class="card">
-    <div class="row" style="justify-content:space-between">
-      <h2>テキスト一覧</h2>
-      <div>
-        <button class="btn small gray" onclick="exportData()">データ書き出し</button>
-        <button class="btn small gray" onclick="document.getElementById('importFile').click()">データ読み込み</button>
-        <input type="file" id="importFile" style="display:none" onchange="importData(event)">
-      </div>
-    </div>
+    <h2>テキスト一覧</h2>
     <div>`;
         TEXTS.forEach((t) => {
           html += `<span class="text-tile" onclick="renderText('${t.id}')">${t.name}</span>`;
@@ -432,7 +456,13 @@
             html += `<tr class="student-row" draggable="true" data-id="${s.id}">
         <td><span class="drag-handle">≡</span></td>
         <td>${s.name}</td>
-        <td>${labels} <button class="btn tiny" onclick="assignText('${s.id}')">＋ テキスト</button></td>
+        <td>
+          <!-- ラベルを左、「＋テキスト」ボタンを右端に寄せる -->
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <span>${labels}</span>
+            <button class="btn tiny" onclick="assignText('${s.id}')">＋ テキスト</button>
+          </div>
+        </td>
         <td><button class="btn tiny red" onclick="deleteStudent('${s.id}')">生徒削除</button></td>
       </tr>`;
           });
@@ -452,7 +482,7 @@
         let html = `<div class="card">
     <div class="row" style="justify-content:space-between">
       <h2>${text.name}</h2>
-      <button class="btn small gray" onclick="renderTop()">← トップへ</button>
+      <button class="btn small gray" onclick="renderTop()">トップへ</button>
     </div>
     <div class="muted" style="margin-bottom:12px">生徒名をクリックすると個別入力画面へ（生徒の追加・削除はトップの生徒一覧から）</div>`;
 
@@ -494,13 +524,19 @@
         let html = `<div class="card">
     <div class="row" style="justify-content:space-between">
       <h2>${text.name} ／ ${student.name}</h2>
-      <button class="btn small gray" onclick="renderText('${textId}')">← 一覧へ戻る</button>
+      <div>
+        <!-- 一覧（マトリクス）へ戻る／トップへ直接戻る の2つを用意 -->
+        <button class="btn small gray" onclick="renderText('${textId}')">進捗一覧へ</button>
+        <button class="btn small gray" onclick="renderTop()">トップへ</button>
+      </div>
     </div>
     <div class="card" style="background:#f0f4f9">
       <div class="unit-title">一括入力（やったページをまとめて入力）</div>
-      <div class="muted">例: 14,15,16,17 または 14-17 のように入力（単元をまたいでもOK）</div>
+      <div class="muted">例: 14,15,16,17 または 14-17 のように入力（単元をまたいでもOK ／ Ctrl+Enterで反映）</div>
       <div class="row" style="margin-top:8px">
-        <input type="text" id="bulkInput" placeholder="例: 11,13,15-18" style="width:240px">
+        <!-- onkeydown: Ctrl+Enter（またはCmd+Enter）で「追加で実施済み」を実行 -->
+        <input type="text" id="bulkInput" placeholder="例: 11,13,15-18" style="width:240px"
+               onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){applyBulk('${textId}','${studentId}','add');}">
         <button class="btn small" onclick="applyBulk('${textId}','${studentId}','add')">追加で実施済みにする</button>
         <button class="btn small gray" onclick="applyBulk('${textId}','${studentId}','remove')">入力分を取り消す</button>
       </div>
