@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>授業進行管理</title>
+    <style>
+      /* ===== 全体の見た目（自由に色など変えてOK） ===== */
+      body {
+        font-family: "Segoe UI", "Hiragino Sans", sans-serif;
+        margin: 0;
+        background: #f4f6f8;
+        color: #222;
+      }
+      header {
+        background: #2c7be5;
+        color: #fff;
+        padding: 14px 20px;
+        font-size: 20px;
+        font-weight: bold;
+      }
+      .wrap {
+        padding: 20px;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      button {
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .btn {
+        background: #2c7be5;
+        color: #fff;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+      .btn.gray {
+        background: #888;
+      }
+      .btn.red {
+        background: #c0392b;
+      }
+      .btn.small {
+        padding: 4px 10px;
+        font-size: 13px;
+      }
+      .btn.tiny {
+        padding: 2px 6px;
+        font-size: 11px;
+      }
+      .card {
+        background: #fff;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .text-tile {
+        display: inline-block;
+        background: #fff;
+        border: 2px solid #2c7be5;
+        color: #2c7be5;
+        border-radius: 8px;
+        padding: 18px 24px;
+        margin: 8px;
+        font-size: 16px;
+        font-weight: bold;
+      }
+      .text-tile:hover {
+        background: #2c7be5;
+        color: #fff;
+      }
+      h2 {
+        font-size: 18px;
+        margin: 8px 0 16px;
+      }
+      /* ===== マトリクス表 ===== */
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        background: #fff;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 6px 8px;
+        text-align: center;
+        font-size: 13px;
+      }
+      th.unit,
+      td.unit {
+        text-align: left;
+        min-width: 180px;
+        background: #f0f4f9;
+      }
+      .barbox {
+        background: #e6e6e6;
+        border-radius: 4px;
+        height: 16px;
+        width: 90px;
+        margin: 0 auto;
+        overflow: hidden;
+        position: relative;
+      }
+      .bar {
+        background: #2c7be5;
+        height: 100%;
+      }
+      .barlabel {
+        font-size: 11px;
+        color: #555;
+      }
+      .name-cell {
+        cursor: pointer;
+        color: #2c7be5;
+        text-decoration: underline;
+      }
+      /* ===== 個別画面のページボタン ===== */
+      .unit-block {
+        margin-bottom: 14px;
+      }
+      .unit-title {
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+      .page-btns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .page-btn {
+        width: 38px;
+        height: 38px;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        background: #fff;
+        font-size: 12px;
+      }
+      .page-btn.done {
+        background: #2c7be5;
+        color: #fff;
+        border-color: #2c7be5;
+      }
+      .muted {
+        color: #888;
+        font-size: 13px;
+      }
+      input[type="text"] {
+        padding: 6px;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+      .warn {
+        color: #c0392b;
+        font-size: 13px;
+        margin-top: 6px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      /* ===== 生徒一覧（トップ下半分） ===== */
+      .student-table {
+        border-collapse: collapse;
+        width: 100%;
+        background: #fff;
+      }
+      .student-table th,
+      .student-table td {
+        border: 1px solid #ddd;
+        padding: 8px 10px;
+        text-align: left;
+        font-size: 14px;
+      }
+      .student-table th {
+        background: #e9eef5;
+      }
+      .student-row {
+        cursor: grab;
+      } /* ドラッグできることを示すカーソル */
+      .student-row.dragging {
+        opacity: 0.4;
+      } /* ドラッグ中の見た目 */
+      .drag-handle {
+        cursor: grab;
+        color: #999;
+        margin-right: 6px;
+        user-select: none;
+      }
+      /* 使用テキストのラベル（クリックで個別画面へ） */
+      .text-label {
+        display: inline-block;
+        background: #eaf2fd;
+        color: #2c7be5;
+        border-radius: 4px;
+        padding: 3px 8px;
+        margin: 2px 4px 2px 0;
+        font-size: 13px;
+      }
+      .text-label .go {
+        cursor: pointer;
+        text-decoration: underline;
+      }
+      .text-label .x {
+        cursor: pointer;
+        color: #c0392b;
+        margin-left: 6px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <header>授業進行管理</header>
+    <div class="wrap" id="app"></div>
+
+    <script>
+      /* =====================================================================
+   ① テキスト（教材）データ定義エリア
+   ---------------------------------------------------------------------
+   ★テキストを追加したいときは、この TEXTS 配列に同じ形でもう1冊足すだけ。
+   ・id     : テキストの識別名（半角英数。他と重複しないように）
+   ・name   : 画面に表示される名前
+   ・units  : 単元の配列。各単元は { name:単元名, start:開始ページ, end:終了ページ }
+   ===================================================================== */
+      const TEXTS = [
+        {
+          id: "math1",
+          name: "中1 数学 啓林",
+          units: [
+            { name: "小復1 数の計算と性質", start: 4, end: 5 },
+            { name: "小復2 単位量あたりの大きさ", start: 6, end: 7 },
+            { name: "小復3 図形", start: 8, end: 9 },
+            { name: "1 正の数・負の数", start: 10, end: 15 },
+            { name: "2 加法、減法", start: 16, end: 21 },
+            { name: "3 乗法、除法", start: 22, end: 25 },
+            { name: "4 乗法と除法の混じった計算", start: 26, end: 29 },
+            { name: "5 いろいろな計算", start: 30, end: 37 },
+            { name: "★ 1章 計算トレーニング", start: 38, end: 43 },
+            { name: "● 1章 まとめ", start: 44, end: 49 },
+            { name: "6 文字を使った式", start: 50, end: 57 },
+            { name: "7 文字式の加法、減法", start: 58, end: 61 },
+            { name: "8 文字式と数の乗法、除法", start: 62, end: 65 },
+            { name: "9 関係を表す式", start: 66, end: 69 },
+            { name: "★ 2章 計算トレーニング", start: 70, end: 73 },
+            { name: "● 2章 まとめ", start: 74, end: 79 },
+            { name: "10 方程式とその解", start: 80, end: 83 },
+            { name: "11 いろいろな方程式", start: 84, end: 89 },
+            { name: "12 方程式の利用(1)", start: 90, end: 93 },
+            { name: "13 方程式の利用(2)", start: 94, end: 99 },
+            { name: "★ 3章 計算トレーニング", start: 100, end: 103 },
+            { name: "● 3章 まとめ", start: 104, end: 109 },
+            { name: "14 関数・比例", start: 110, end: 115 },
+            { name: "15 比例のグラフ", start: 116, end: 119 },
+            { name: "16 反比例", start: 120, end: 123 },
+            { name: "17 比例、反比例の利用", start: 124, end: 129 },
+            { name: "★ 4章 単問トレーニング", start: 130, end: 131 },
+            { name: "● 4章 まとめ", start: 132, end: 137 },
+            { name: "18 直線と図形、移動", start: 138, end: 143 },
+            { name: "19 基本の作図", start: 144, end: 149 },
+            { name: "20 円とおうぎ形", start: 150, end: 155 },
+            { name: "★ 5章 単問トレーニング", start: 156, end: 157 },
+            { name: "● 5章 まとめ", start: 158, end: 163 },
+            { name: "21 いろいろな立体", start: 164, end: 169 },
+            { name: "22 空間内の位置関係", start: 170, end: 175 },
+            { name: "23 体積・表面積", start: 176, end: 183 },
+            { name: "★ 6章 単問トレーニング", start: 184, end: 185 },
+            { name: "● 6章 まとめ", start: 186, end: 191 },
+            { name: "24 データの活用", start: 192, end: 199 },
+            { name: "★ 7章 単問トレーニング", start: 200, end: 201 },
+            { name: "● 7章 まとめ", start: 202, end: 207 },
+          ],
+        },
+        // ★ここに次のテキストを追加 → { id:"...", name:"...", units:[ ... ] },
+      ];
+
+      /* =====================================================================
+   ② データ保存（localStorage）まわり
+   ---------------------------------------------------------------------
+   ・生徒情報・進捗は すべてこのブラウザの中だけに保存される（外部に出ない）
+   ・データ構造:
+     {
+       students: [ {id, name, texts:[textId...]} ... ], // 生徒と、その生徒の使用テキスト
+       progress: { "textId|studentId": [実施済みページ番号...] }
+     }
+   ・students 配列の「並び順」がそのまま生徒一覧の表示順になる（ドラッグで入替）
+   ===================================================================== */
+      const STORAGE_KEY = "jugyo_progress_v2"; // 構造変更したのでキーをv2に
+
+      function loadData() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return { students: [], progress: {} };
+        try {
+          const d = JSON.parse(raw);
+          if (!d.students) d.students = [];
+          if (!d.progress) d.progress = {};
+          // 念のため：texts プロパティが無い生徒に空配列を補う
+          d.students.forEach((s) => {
+            if (!s.texts) s.texts = [];
+          });
+          return d;
+        } catch (e) {
+          return { students: [], progress: {} };
+        }
+      }
+      function saveData(d) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+      }
+      let DATA = loadData();
+
+      function progKey(textId, studentId) {
+        return textId + "|" + studentId;
+      }
+      function getDonePages(textId, studentId) {
+        return DATA.progress[progKey(textId, studentId)] || [];
+      }
+      function setDonePages(textId, studentId, pages) {
+        const uniq = Array.from(new Set(pages)).sort((a, b) => a - b);
+        DATA.progress[progKey(textId, studentId)] = uniq;
+        saveData(DATA);
+      }
+      // 生徒オブジェクト取得
+      function getStudent(id) {
+        return DATA.students.find((s) => s.id === id);
+      }
+      // あるテキストを使用している生徒一覧（students の並び順を維持）
+      function studentsUsingText(textId) {
+        return DATA.students.filter((s) => s.texts.includes(textId));
+      }
+
+      /* =====================================================================
+   ③ 計算・便利関数
+   ===================================================================== */
+      function unitTotalPages(u) {
+        return u.end - u.start + 1;
+      }
+      function unitDoneCount(u, donePages) {
+        return donePages.filter((p) => p >= u.start && p <= u.end).length;
+      }
+      function unitRate(u, donePages) {
+        const total = unitTotalPages(u);
+        if (total === 0) return 0;
+        return Math.round((unitDoneCount(u, donePages) / total) * 100);
+      }
+      function allPagesOfText(text) {
+        const set = new Set();
+        text.units.forEach((u) => {
+          for (let p = u.start; p <= u.end; p++) set.add(p);
+        });
+        return set;
+      }
+      // "11,13,15-18" → ページ配列に変換
+      function parsePageInput(str) {
+        const pages = [],
+          bad = [];
+        str.split(",").forEach((token) => {
+          token = token.trim();
+          if (token === "") return;
+          if (token.includes("-")) {
+            const [a, b] = token.split("-").map((s) => parseInt(s.trim(), 10));
+            if (isNaN(a) || isNaN(b)) {
+              bad.push(token);
+              return;
+            }
+            const lo = Math.min(a, b),
+              hi = Math.max(a, b);
+            for (let p = lo; p <= hi; p++) pages.push(p);
+          } else {
+            const n = parseInt(token, 10);
+            if (isNaN(n)) {
+              bad.push(token);
+              return;
+            }
+            pages.push(n);
+          }
+        });
+        return { pages, bad };
+      }
+
+      /* =====================================================================
+   ④ 画面描画
+   ===================================================================== */
+      const app = document.getElementById("app");
+
+      // --- トップ画面：上＝テキスト一覧 / 下＝生徒一覧 ---
+      function renderTop() {
+        // 上半分：テキスト一覧
+        let html = `<div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h2>テキスト一覧</h2>
+      <div>
+        <button class="btn small gray" onclick="exportData()">データ書き出し</button>
+        <button class="btn small gray" onclick="document.getElementById('importFile').click()">データ読み込み</button>
+        <input type="file" id="importFile" style="display:none" onchange="importData(event)">
+      </div>
+    </div>
+    <div>`;
+        TEXTS.forEach((t) => {
+          html += `<span class="text-tile" onclick="renderText('${t.id}')">${t.name}</span>`;
+        });
+        html += `</div></div>`;
+
+        // 下半分：生徒一覧（ドラッグ並び替え対応）
+        html += `<div class="card">
+    <div class="row" style="margin-bottom:12px">
+      <h2 style="margin:0">生徒一覧</h2>
+      <button class="btn small" onclick="addStudent()">＋ 生徒を追加</button>
+      <span class="muted">行を掴んで上下にドラッグすると並び替えできます</span>
+    </div>
+    <table class="student-table" id="studentTable">
+      <tr><th style="width:40px"></th><th style="width:160px">生徒名</th><th>使用テキスト</th><th style="width:90px">操作</th></tr>`;
+
+        if (DATA.students.length === 0) {
+          html += `<tr><td colspan="4" class="muted">まだ生徒がいません。「＋ 生徒を追加」から登録してください。</td></tr>`;
+        } else {
+          DATA.students.forEach((s) => {
+            // 使用テキストのラベル（クリックで個別画面へ／✕でそのテキストだけ外す）
+            let labels = "";
+            s.texts.forEach((tid) => {
+              const t = TEXTS.find((x) => x.id === tid);
+              if (!t) return;
+              labels += `<span class="text-label">
+                     <span class="go" onclick="renderStudent('${tid}','${s.id}')">${t.name}</span>
+                     <span class="x" title="このテキストを外す" onclick="removeTextFromStudent('${s.id}','${tid}')">✕</span>
+                   </span>`;
+            });
+            // draggable=true で行をドラッグ可能に。data-id で生徒を識別
+            html += `<tr class="student-row" draggable="true" data-id="${s.id}">
+        <td><span class="drag-handle">≡</span></td>
+        <td>${s.name}</td>
+        <td>${labels} <button class="btn tiny" onclick="assignText('${s.id}')">＋ テキスト</button></td>
+        <td><button class="btn tiny red" onclick="deleteStudent('${s.id}')">生徒削除</button></td>
+      </tr>`;
+          });
+        }
+        html += `</table></div>`;
+        app.innerHTML = html;
+
+        // 生徒一覧にドラッグ並び替えの機能をセット
+        setupDragSort();
+      }
+
+      // --- テキスト詳細画面：マトリクス（縦=単元 / 横=生徒）。※「外す」ボタンは撤去済 ---
+      function renderText(textId) {
+        const text = TEXTS.find((t) => t.id === textId);
+        const enrolled = studentsUsingText(textId); // students の並び順を引き継ぐ
+
+        let html = `<div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h2>${text.name}</h2>
+      <button class="btn small gray" onclick="renderTop()">← トップへ</button>
+    </div>
+    <div class="muted" style="margin-bottom:12px">生徒名をクリックすると個別入力画面へ（生徒の追加・削除はトップの生徒一覧から）</div>`;
+
+        if (enrolled.length === 0) {
+          html += `<p class="muted">このテキストを使用している生徒がいません。トップの生徒一覧で「＋テキスト」から割り当ててください。</p></div>`;
+          app.innerHTML = html;
+          return;
+        }
+
+        html += `<table><tr><th class="unit">単元</th>`;
+        enrolled.forEach((s) => {
+          // 「外す」ボタンは撤去。生徒名クリックのみ（個別画面へ）
+          html += `<th><span class="name-cell" onclick="renderStudent('${textId}','${s.id}')">${s.name}</span></th>`;
+        });
+        html += `</tr>`;
+
+        text.units.forEach((u) => {
+          html += `<tr><td class="unit">${u.name}<br><span class="muted">p.${u.start}–${u.end}</span></td>`;
+          enrolled.forEach((s) => {
+            const done = getDonePages(textId, s.id);
+            const rate = unitRate(u, done);
+            html += `<td>
+        <div class="barbox"><div class="bar" style="width:${rate}%"></div></div>
+        <span class="barlabel">${rate}% (${unitDoneCount(u, done)}/${unitTotalPages(u)})</span>
+      </td>`;
+          });
+          html += `</tr>`;
+        });
+        html += `</table></div>`;
+        app.innerHTML = html;
+      }
+
+      // --- 生徒個別画面：ページごとチェック ＋ 一括入力（変更なし） ---
+      function renderStudent(textId, studentId) {
+        const text = TEXTS.find((t) => t.id === textId);
+        const student = getStudent(studentId);
+        const done = getDonePages(textId, studentId);
+
+        let html = `<div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h2>${text.name} ／ ${student.name}</h2>
+      <button class="btn small gray" onclick="renderText('${textId}')">← 一覧へ戻る</button>
+    </div>
+    <div class="card" style="background:#f0f4f9">
+      <div class="unit-title">一括入力（やったページをまとめて入力）</div>
+      <div class="muted">例: 14,15,16,17 または 14-17 のように入力（単元をまたいでもOK）</div>
+      <div class="row" style="margin-top:8px">
+        <input type="text" id="bulkInput" placeholder="例: 11,13,15-18" style="width:240px">
+        <button class="btn small" onclick="applyBulk('${textId}','${studentId}','add')">追加で実施済みにする</button>
+        <button class="btn small gray" onclick="applyBulk('${textId}','${studentId}','remove')">入力分を取り消す</button>
+      </div>
+      <div id="bulkWarn" class="warn"></div>
+    </div>`;
+
+        text.units.forEach((u) => {
+          html += `<div class="unit-block">
+      <div class="unit-title">${u.name} <span class="muted">(p.${u.start}–${u.end})</span></div>
+      <div class="page-btns">`;
+          for (let p = u.start; p <= u.end; p++) {
+            const isDone = done.includes(p);
+            html += `<button class="page-btn ${isDone ? "done" : ""}" onclick="togglePage('${textId}','${studentId}',${p})">${p}</button>`;
+          }
+          html += `</div></div>`;
+        });
+        html += `</div>`;
+        app.innerHTML = html;
+      }
+
+      /* =====================================================================
+   ⑤ 操作
+   ===================================================================== */
+      function togglePage(textId, studentId, page) {
+        let done = getDonePages(textId, studentId).slice();
+        if (done.includes(page)) done = done.filter((p) => p !== page);
+        else done.push(page);
+        setDonePages(textId, studentId, done);
+        renderStudent(textId, studentId);
+      }
+
+      function applyBulk(textId, studentId, mode) {
+        const str = document.getElementById("bulkInput").value;
+        const { pages, bad } = parsePageInput(str);
+        const validPages = allPagesOfText(TEXTS.find((t) => t.id === textId));
+        const outOfRange = pages.filter((p) => !validPages.has(p));
+        const ok = pages.filter((p) => validPages.has(p));
+
+        let done = getDonePages(textId, studentId).slice();
+        if (mode === "add") done = done.concat(ok);
+        else done = done.filter((p) => !ok.includes(p));
+        setDonePages(textId, studentId, done);
+
+        const warnMsgs = [];
+        if (bad.length) warnMsgs.push("解釈できない入力: " + bad.join(", "));
+        if (outOfRange.length)
+          warnMsgs.push(
+            "このテキストに存在しないページ(無視しました): " +
+              outOfRange.join(", "),
+          );
+        renderStudent(textId, studentId);
+        if (warnMsgs.length)
+          document.getElementById("bulkWarn").textContent =
+            "⚠ " + warnMsgs.join(" ／ ");
+      }
+
+      // 生徒を新規追加（名前だけ。テキストは後から割り当て）
+      function addStudent() {
+        const name = prompt("生徒名を入力してください");
+        if (!name) return;
+        const trimmed = name.trim();
+        if (!trimmed) return;
+        DATA.students.push({ id: "s" + Date.now(), name: trimmed, texts: [] });
+        saveData(DATA);
+        renderTop();
+      }
+
+      // 生徒にテキストを割り当てる（まだ割り当ててないテキストから選ぶ）
+      function assignText(studentId) {
+        const student = getStudent(studentId);
+        const available = TEXTS.filter((t) => !student.texts.includes(t.id)); // 未割り当てのみ
+        if (available.length === 0) {
+          alert("割り当てられるテキストがもうありません。");
+          return;
+        }
+
+        // 番号で選んでもらう簡易プロンプト
+        let msg = "割り当てるテキストの番号を入力してください:\n";
+        available.forEach((t, i) => {
+          msg += `${i + 1}: ${t.name}\n`;
+        });
+        const input = prompt(msg);
+        if (input === null) return;
+        const idx = parseInt(input, 10) - 1;
+        if (isNaN(idx) || idx < 0 || idx >= available.length) {
+          alert("正しい番号を入力してください。");
+          return;
+        }
+
+        student.texts.push(available[idx].id);
+        saveData(DATA);
+        renderTop();
+      }
+
+      // 生徒からテキストを1つ外す（そのテキストの進捗データも消す）
+      function removeTextFromStudent(studentId, textId) {
+        const student = getStudent(studentId);
+        const t = TEXTS.find((x) => x.id === textId);
+        if (
+          !confirm(
+            `「${student.name}」から「${t.name}」を外しますか?\n（このテキストの進捗データも削除されます）`,
+          )
+        )
+          return;
+        student.texts = student.texts.filter((id) => id !== textId);
+        delete DATA.progress[progKey(textId, studentId)]; // 進捗も削除
+        saveData(DATA);
+        renderTop();
+      }
+
+      // 生徒をまるごと削除（全テキスト・全進捗を削除）
+      function deleteStudent(studentId) {
+        const student = getStudent(studentId);
+        if (
+          !confirm(
+            `「${student.name}」を削除しますか?\n（この生徒の全テキストの進捗データもすべて削除されます。元に戻せません）`,
+          )
+        )
+          return;
+        // この生徒の進捗データを全部削除
+        student.texts.forEach((tid) => {
+          delete DATA.progress[progKey(tid, studentId)];
+        });
+        // 生徒本体を削除
+        DATA.students = DATA.students.filter((s) => s.id !== studentId);
+        saveData(DATA);
+        renderTop();
+      }
+
+      /* =====================================================================
+   ⑥ 生徒一覧のドラッグ並び替え
+   ---------------------------------------------------------------------
+   ・行(tr)をドラッグして、別の行の上に落とすと順番が入れ替わる
+   ・並び順は DATA.students 配列の順番として保存される（次回も維持）
+   ===================================================================== */
+      let dragId = null; // ドラッグ中の生徒id
+
+      function setupDragSort() {
+        const rows = document.querySelectorAll("#studentTable .student-row");
+        rows.forEach((row) => {
+          // ドラッグ開始
+          row.addEventListener("dragstart", (e) => {
+            dragId = row.dataset.id;
+            row.classList.add("dragging");
+          });
+          // ドラッグ終了
+          row.addEventListener("dragend", (e) => {
+            row.classList.remove("dragging");
+            dragId = null;
+          });
+          // 上に他の行が乗ったとき（ドロップを許可するため必要）
+          row.addEventListener("dragover", (e) => {
+            e.preventDefault();
+          });
+          // ドロップされたとき：dragId の生徒を、この行の位置へ移動
+          row.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const targetId = row.dataset.id;
+            if (!dragId || dragId === targetId) return;
+            reorderStudents(dragId, targetId);
+          });
+        });
+      }
+
+      // dragId の生徒を targetId の位置に差し込む形で並び替え
+      function reorderStudents(dragId, targetId) {
+        const arr = DATA.students;
+        const from = arr.findIndex((s) => s.id === dragId);
+        const to = arr.findIndex((s) => s.id === targetId);
+        if (from === -1 || to === -1) return;
+        const [moved] = arr.splice(from, 1); // いったん抜く
+        arr.splice(to, 0, moved); // ターゲットの位置に挿入
+        saveData(DATA);
+        renderTop();
+      }
+
+      /* =====================================================================
+   ⑦ バックアップ（書き出し／読み込み）
+   ===================================================================== */
+      function exportData() {
+        const blob = new Blob([JSON.stringify(DATA, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const today = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = "授業進行バックアップ_" + today + ".json";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+      function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const obj = JSON.parse(e.target.result);
+            if (!obj.students || !obj.progress)
+              throw new Error("形式が違います");
+            if (
+              !confirm(
+                "現在のデータを、読み込むファイルの内容で置き換えます。よろしいですか?",
+              )
+            )
+              return;
+            DATA = obj;
+            DATA.students.forEach((s) => {
+              if (!s.texts) s.texts = [];
+            }); // 念のため補正
+            saveData(DATA);
+            renderTop();
+            alert("読み込みました。");
+          } catch (err) {
+            alert("読み込みに失敗しました: " + err.message);
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      /* =====================================================================
+   ⑧ 起動
+   ===================================================================== */
+      renderTop();
+    </script>
+  </body>
+</html>
