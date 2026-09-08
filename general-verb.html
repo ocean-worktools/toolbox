@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>一般動詞 総復習プリント</title>
+    <style>
+      /* ===== 印刷ページ設定：A4・余白（be動詞版と同一） ===== */
+      @page {
+        size: A4;
+        margin: 15mm 14mm;
+      }
+
+      /* ===== 全体の基本スタイル ===== */
+      body {
+        font-family:
+          "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+        font-size: 10.5pt;
+        line-height: 1.6;
+        color: #111;
+        margin: 0;
+        max-width: 182mm;
+        margin-inline: auto;
+      }
+
+      /* ===== タイトル部分 ===== */
+      h1 {
+        font-size: 16pt;
+        text-align: center;
+        margin: 0 0 2mm;
+        letter-spacing: 0.05em;
+      }
+      .meta {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10mm;
+        font-size: 9.5pt;
+        margin-bottom: 4mm;
+      }
+      .meta span {
+        border-bottom: 1px solid #333;
+        min-width: 45mm;
+        padding-bottom: 1mm;
+      }
+
+      /* ===== セクション見出し ===== */
+      h2 {
+        font-size: 11.5pt;
+        background: #eeeeee;
+        border-left: 4px solid #555;
+        padding: 1.5mm 3mm;
+        margin: 5mm 0 2.5mm;
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      /* ===== 例文リスト ===== */
+      ol {
+        margin: 0 0 2mm;
+        padding-left: 6mm;
+      }
+      li {
+        margin-bottom: 1.2mm;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      /* 注目させたい動詞部分を強調（be動詞版の .be と同じ役割） */
+      .v {
+        font-weight: bold;
+        background: #ffe9a8;
+        padding: 0 1px;
+      }
+      /* 日本語訳 */
+      .ja {
+        font-size: 9pt;
+        color: #555;
+        margin-left: 0.5em;
+      }
+
+      /* ===== ポイント囲み ===== */
+      .point {
+        border: 1px solid #999;
+        background: #f7f7f7;
+        padding: 2mm 3mm;
+        font-size: 9.5pt;
+        margin: 0 0 2mm;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .point b {
+        color: #b00;
+      }
+
+      /* ===== 応答文（Q&A）用 ===== */
+      .qa .ans {
+        display: block;
+        margin-left: 1.5em;
+        color: #333;
+      }
+
+      /* ===== ルール表（三単現のs／過去形の作り方） ===== */
+      table {
+        width: 100%;
+        border-collapse: collapse; /* 罫線を1本にまとめる */
+        font-size: 9.5pt;
+        margin: 0 0 2mm;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      th,
+      td {
+        border: 1px solid #999;
+        padding: 1.5mm 2mm;
+        vertical-align: top;
+      }
+      th {
+        background: #ececec;
+        text-align: left;
+        white-space: nowrap; /* 見出し列を折り返さない */
+      }
+
+      /* ===== 2ページ目の始まり位置を固定する用 ===== */
+      .page-break {
+        break-before: page;
+        page-break-before: always;
+      }
+
+      @media screen {
+        body {
+          padding: 10mm 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>一般動詞 総復習プリント</h1>
+
+    <div class="meta">
+      <span>名前：</span>
+      <span>日付：</span>
+    </div>
+
+    <!-- ================= ① 現在形（主語で形が変わる） ================= -->
+    <h2>① 現在形 ― 主語による使い分け</h2>
+    <ol>
+      <li>
+        I <span class="v">play</span> the piano every day.<span class="ja"
+          >私は毎日ピアノをひきます。</span
+        >
+      </li>
+      <li>
+        You <span class="v">like</span> Japanese food.<span class="ja"
+          >あなたは日本料理が好きです。</span
+        >
+      </li>
+      <li>
+        We <span class="v">study</span> English at school.<span class="ja"
+          >私たちは学校で英語を勉強します。</span
+        >
+      </li>
+      <li>
+        They <span class="v">live</span> in Tokyo.<span class="ja"
+          >彼らは東京に住んでいます。</span
+        >
+      </li>
+      <li>
+        He <span class="v">plays</span> soccer after school.<span class="ja"
+          >彼は放課後サッカーをします。</span
+        >
+      </li>
+      <li>
+        She <span class="v">walks</span> to school.<span class="ja"
+          >彼女は歩いて学校へ行きます。</span
+        >
+      </li>
+      <li>
+        My father <span class="v">washes</span> his car on Sunday.<span
+          class="ja"
+          >父は日曜日に車を洗います。</span
+        >
+      </li>
+      <li>
+        Ken <span class="v">studies</span> math every night.<span class="ja"
+          >ケンは毎晩数学を勉強します。</span
+        >
+      </li>
+      <li>
+        My sister <span class="v">has</span> two dogs.<span class="ja"
+          >姉は犬を2匹飼っています。</span
+        >
+      </li>
+      <li>
+        That bus <span class="v">goes</span> to the station.<span class="ja"
+          >あのバスは駅へ行きます。</span
+        >
+      </li>
+    </ol>
+    <p class="point">
+      主語が <b>三人称単数</b>（he / she / it / 人名 /
+      単数の名詞）で現在の話のとき、動詞に <b>s・es</b> をつける。<br />
+      I / you / we / they・複数の名詞のときは、動詞はそのまま。
+    </p>
+
+    <!-- ================= ② 三単現のs のつけ方 ================= -->
+    <h2>② 三人称単数現在形（s・es）のつけ方</h2>
+    <table>
+      <tr>
+        <th>ふつう</th>
+        <td>s をつける／ play → plays、like → likes、come → comes</td>
+      </tr>
+      <tr>
+        <th>s, sh, ch, o, x で終わる</th>
+        <td>
+          es をつける／ wash → washes、teach → teaches、go → goes、watch →
+          watches
+        </td>
+      </tr>
+      <tr>
+        <th>〈子音字＋y〉で終わる</th>
+        <td>
+          y を i にして es ／ study → studies、carry → carries、try → tries
+        </td>
+      </tr>
+      <tr>
+        <th>とくべつな形</th>
+        <td>have → <b>has</b></td>
+      </tr>
+    </table>
+
+    <!-- ================= ③ 過去形 ================= -->
+    <h2>③ 過去形 ― 主語が何でも形は同じ</h2>
+    <ol>
+      <li>
+        I <span class="v">watched</span> TV last night.<span class="ja"
+          >私は昨夜テレビを見ました。</span
+        >
+      </li>
+      <li>
+        She <span class="v">played</span> tennis yesterday.<span class="ja"
+          >彼女は昨日テニスをしました。</span
+        >
+      </li>
+      <li>
+        We <span class="v">studied</span> science last week.<span class="ja"
+          >私たちは先週理科を勉強しました。</span
+        >
+      </li>
+      <li>
+        He <span class="v">stopped</span> at the corner.<span class="ja"
+          >彼は角で止まりました。</span
+        >
+      </li>
+      <li>
+        They <span class="v">went</span> to the zoo last Sunday.<span class="ja"
+          >彼らは先週の日曜日、動物園へ行きました。</span
+        >
+      </li>
+      <li>
+        Emi <span class="v">had</span> lunch at eleven.<span class="ja"
+          >エミは11時に昼食を食べました。</span
+        >
+      </li>
+      <li>
+        I <span class="v">saw</span> your brother this morning.<span class="ja"
+          >私は今朝あなたの兄を見かけました。</span
+        >
+      </li>
+      <li>
+        My mother <span class="v">made</span> a cake for me.<span class="ja"
+          >母は私にケーキを作ってくれました。</span
+        >
+      </li>
+    </ol>
+    <table>
+      <tr>
+        <th>ふつう（規則動詞）</th>
+        <td>ed をつける／ play → played、watch → watched</td>
+      </tr>
+      <tr>
+        <th>e で終わる</th>
+        <td>d だけつける／ like → liked、use → used</td>
+      </tr>
+      <tr>
+        <th>〈子音字＋y〉で終わる</th>
+        <td>y を i にして ed ／ study → studied、carry → carried</td>
+      </tr>
+      <tr>
+        <th>〈短母音＋子音字〉で終わる</th>
+        <td>子音字を重ねて ed ／ stop → stopped、plan → planned</td>
+      </tr>
+      <tr>
+        <th>不規則動詞</th>
+        <td>
+          go → went、have → had、see → saw、make → made、get → got、come →
+          came、eat → ate、write → wrote
+        </td>
+      </tr>
+    </table>
+
+    <!-- ここから2ページ目 -->
+    <div class="page-break"></div>
+
+    <!-- ================= ④ 否定文 ================= -->
+    <h2>④ 否定文 ― don't / doesn't / didn't ＋ 動詞の原形</h2>
+    <ol>
+      <li>
+        I <span class="v">don't</span> like natto.<span class="ja"
+          >私は納豆が好きではありません。</span
+        >
+      </li>
+      <li>
+        We <span class="v">don't</span> have club activities today.<span
+          class="ja"
+          >私たちは今日部活がありません。</span
+        >
+      </li>
+      <li>
+        He <span class="v">doesn't</span> play the guitar.<span class="ja"
+          >彼はギターをひきません。</span
+        >
+      </li>
+      <li>
+        She <span class="v">doesn't</span> watch TV in the morning.<span
+          class="ja"
+          >彼女は朝テレビを見ません。</span
+        >
+      </li>
+      <li>
+        My father <span class="v">doesn't</span> drink coffee.<span class="ja"
+          >父はコーヒーを飲みません。</span
+        >
+      </li>
+      <li>
+        I <span class="v">didn't</span> go to school yesterday.<span class="ja"
+          >私は昨日学校へ行きませんでした。</span
+        >
+      </li>
+      <li>
+        They <span class="v">didn't</span> come to the party.<span class="ja"
+          >彼らはパーティーに来ませんでした。</span
+        >
+      </li>
+    </ol>
+    <p class="point">
+      現在：I / you / we / they → <b>don't</b> ／ he / she / it・単数 →
+      <b>doesn't</b><br />
+      過去：主語が何でも <b>didn't</b><br />
+      ※ doesn't・didn't のあとの動詞は必ず <b>原形</b>。plays・played
+      にしない！<br />
+      　（× He doesn't plays. → ○ He doesn't <b>play</b>.）
+    </p>
+
+    <!-- ================= ⑤ 疑問文と応答文 ================= -->
+    <h2>⑤ 疑問文と応答文 ― Do / Does / Did で文を始める</h2>
+    <ol class="qa">
+      <li>
+        <span class="v">Do</span> you like music?
+        <span class="ans">— Yes, I do. / No, I don't.</span>
+      </li>
+      <li>
+        <span class="v">Do</span> they live near here?
+        <span class="ans">— Yes, they do. / No, they don't.</span>
+      </li>
+      <li>
+        <span class="v">Does</span> he play baseball?
+        <span class="ans">— Yes, he does. / No, he doesn't.</span>
+      </li>
+      <li>
+        <span class="v">Does</span> your sister speak English?
+        <span class="ans">— Yes, she does. / No, she doesn't.</span>
+      </li>
+      <li>
+        <span class="v">Did</span> you clean your room?
+        <span class="ans">— Yes, I did. / No, I didn't.</span>
+      </li>
+      <li>
+        <span class="v">Did</span> Ken write this letter?
+        <span class="ans">— Yes, he did. / No, he didn't.</span>
+      </li>
+    </ol>
+    <p class="point">
+      答えるときは <b>do / does / did</b> をそのまま使う。（be動詞の is・are
+      は使わない）<br />
+      <b>Do you ～?</b> と聞かれたら <b>Yes, I do.</b>／主語が you → I
+      に変わるので注意！<br />
+      人名で聞かれたら <b>he / she</b> に置きかえて答える。（Did Ken ～? → Yes,
+      <b>he</b> did.）
+    </p>
+
+    <!-- ================= ⑥ まとめ（be動詞との違い） ================= -->
+    <h2>⑥ まとめ ― be動詞との使い分け</h2>
+    <table>
+      <tr>
+        <th></th>
+        <th>be動詞の文</th>
+        <th>一般動詞の文</th>
+      </tr>
+      <tr>
+        <th>ふつうの文</th>
+        <td>He <b>is</b> a soccer player.</td>
+        <td>He <b>plays</b> soccer.</td>
+      </tr>
+      <tr>
+        <th>否定文</th>
+        <td>He <b>isn't</b> a soccer player.</td>
+        <td>He <b>doesn't play</b> soccer.</td>
+      </tr>
+      <tr>
+        <th>疑問文</th>
+        <td><b>Is</b> he a soccer player?</td>
+        <td><b>Does</b> he play soccer?</td>
+      </tr>
+      <tr>
+        <th>応答文</th>
+        <td>Yes, he <b>is</b>. / No, he <b>isn't</b>.</td>
+        <td>Yes, he <b>does</b>. / No, he <b>doesn't</b>.</td>
+      </tr>
+    </table>
+    <p class="point">
+      1つの文に be動詞と一般動詞は同時に入らない。<br />
+      （× He is play soccer. → ○ He <b>plays</b> soccer.）
+    </p>
+  </body>
+</html>
