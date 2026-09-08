@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>be動詞 総復習プリント</title>
+    <style>
+      /* ===== 印刷ページ設定：A4・上下左右の余白 ===== */
+      @page {
+        size: A4; /* 用紙サイズをA4に固定 */
+        margin: 15mm 14mm; /* 上下15mm / 左右14mm */
+      }
+
+      /* ===== 全体の基本スタイル ===== */
+      body {
+        font-family:
+          "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+        font-size: 10.5pt; /* 印刷向けに pt 指定（A4に収まりやすい） */
+        line-height: 1.6;
+        color: #111;
+        margin: 0;
+        /* 画面で見たときもA4幅っぽく見えるように制限 */
+        max-width: 182mm;
+        margin-inline: auto;
+      }
+
+      /* ===== タイトル部分 ===== */
+      h1 {
+        font-size: 16pt;
+        text-align: center;
+        margin: 0 0 2mm;
+        letter-spacing: 0.05em;
+      }
+      /* 名前・日付の記入欄 */
+      .meta {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10mm;
+        font-size: 9.5pt;
+        margin-bottom: 4mm;
+      }
+      .meta span {
+        border-bottom: 1px solid #333; /* 記入用の下線 */
+        min-width: 45mm;
+        padding-bottom: 1mm;
+      }
+
+      /* ===== セクション見出し（①②③④） ===== */
+      h2 {
+        font-size: 11.5pt;
+        background: #eeeeee; /* 背景グレー：印刷時は「背景のグラフィック」ON推奨 */
+        border-left: 4px solid #555;
+        padding: 1.5mm 3mm;
+        margin: 5mm 0 2.5mm;
+        /* 見出しだけがページ末に取り残されるのを防ぐ */
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      /* ===== 例文リスト ===== */
+      ol {
+        margin: 0 0 2mm;
+        padding-left: 6mm;
+      }
+      li {
+        margin-bottom: 1.2mm;
+        /* 1文が途中で改ページされないように */
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      /* be動詞を強調（太字＋薄いマーカー） */
+      .be {
+        font-weight: bold;
+        background: #ffe9a8;
+        padding: 0 1px;
+      }
+      /* 日本語訳は少し小さく・グレーに */
+      .ja {
+        font-size: 9pt;
+        color: #555;
+        margin-left: 0.5em;
+      }
+
+      /* ===== ポイント囲み ===== */
+      .point {
+        border: 1px solid #999;
+        background: #f7f7f7;
+        padding: 2mm 3mm;
+        font-size: 9.5pt;
+        margin: 0 0 2mm;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .point b {
+        color: #b00;
+      } /* 重要語は赤字 */
+
+      /* ===== 応答文（Q&A）用 ===== */
+      .qa .ans {
+        display: block; /* 応答を次の行に落とす */
+        margin-left: 1.5em;
+        color: #333;
+      }
+
+      /* ===== 画面表示時だけの見た目（印刷には出ない） ===== */
+      @media screen {
+        body {
+          padding: 10mm 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>be動詞 総復習プリント</h1>
+
+    <!-- ================= ① 主語による使い分け ================= -->
+    <h2>① 主語による使い分け（現在形）</h2>
+    <ol>
+      <li>
+        I <span class="be">am</span> a junior high school student.<span
+          class="ja"
+          >私は中学生です。</span
+        >
+      </li>
+      <li>
+        You <span class="be">are</span> very kind.<span class="ja"
+          >あなたはとても親切です。</span
+        >
+      </li>
+      <li>
+        He <span class="be">is</span> my brother.<span class="ja"
+          >彼は私の兄です。</span
+        >
+      </li>
+      <li>
+        She <span class="be">is</span> in the music club.<span class="ja"
+          >彼女は音楽部に入っています。</span
+        >
+      </li>
+      <li>
+        It <span class="be">is</span> a new bike.<span class="ja"
+          >それは新しい自転車です。</span
+        >
+      </li>
+      <li>
+        Tom and Ken <span class="be">are</span> good friends.<span class="ja"
+          >トムとケンは仲良しです。</span
+        >
+      </li>
+      <li>
+        We <span class="be">are</span> hungry now.<span class="ja"
+          >私たちは今おなかがすいています。</span
+        >
+      </li>
+      <li>
+        They <span class="be">are</span> from Canada.<span class="ja"
+          >彼らはカナダ出身です。</span
+        >
+      </li>
+      <li>
+        This book <span class="be">is</span> interesting.<span class="ja"
+          >この本はおもしろいです。</span
+        >
+      </li>
+      <li>
+        These flowers <span class="be">are</span> beautiful.<span class="ja"
+          >これらの花はきれいです。</span
+        >
+      </li>
+    </ol>
+    <p class="point">
+      <b>am</b> → I ／ <b>is</b> → He・She・It・単数の名詞 ／ <b>are</b> →
+      You・We・They・複数の名詞
+    </p>
+
+    <!-- ================= ② 過去形 ================= -->
+    <h2>② 過去形（was / were）</h2>
+    <ol>
+      <li>
+        I <span class="be">was</span> tired yesterday.<span class="ja"
+          >私は昨日疲れていました。</span
+        >
+      </li>
+      <li>
+        You <span class="be">were</span> at home last night.<span class="ja"
+          >あなたは昨夜家にいました。</span
+        >
+      </li>
+      <li>
+        He <span class="be">was</span> a soccer player.<span class="ja"
+          >彼はサッカー選手でした。</span
+        >
+      </li>
+      <li>
+        The test <span class="be">was</span> difficult.<span class="ja"
+          >そのテストは難しかったです。</span
+        >
+      </li>
+      <li>
+        We <span class="be">were</span> in Osaka last week.<span class="ja"
+          >私たちは先週大阪にいました。</span
+        >
+      </li>
+      <li>
+        They <span class="be">were</span> busy this morning.<span class="ja"
+          >彼らは今朝忙しかったです。</span
+        >
+      </li>
+    </ol>
+    <p class="point">am・is → <b>was</b> ／ are → <b>were</b></p>
+
+    <!-- ================= ③ 否定文 ================= -->
+    <h2>③ 否定文（be動詞のうしろに not）</h2>
+    <ol>
+      <li>
+        I <span class="be">am not</span> a soccer fan.<span class="ja"
+          >私はサッカーファンではありません。</span
+        >
+      </li>
+      <li>
+        She <span class="be">is not</span> (isn't) at school today.<span
+          class="ja"
+          >彼女は今日学校にいません。</span
+        >
+      </li>
+      <li>
+        They <span class="be">are not</span> (aren't) my classmates.<span
+          class="ja"
+          >彼らは私のクラスメイトではありません。</span
+        >
+      </li>
+      <li>
+        It <span class="be">was not</span> (wasn't) cold last Sunday.<span
+          class="ja"
+          >先週の日曜日は寒くなかったです。</span
+        >
+      </li>
+      <li>
+        We <span class="be">were not</span> (weren't) late for school.<span
+          class="ja"
+          >私たちは学校に遅刻しませんでした。</span
+        >
+      </li>
+    </ol>
+    <p class="point">
+      短縮形：is not → <b>isn't</b> ／ are not → <b>aren't</b> ／ was not →
+      <b>wasn't</b> ／ were not → <b>weren't</b><br />
+      ※ am not に短縮形はなし。I am not → <b>I'm not</b> の形にする。
+    </p>
+
+    <!-- ================= ④ 疑問文と応答文 ================= -->
+    <h2>④ 疑問文と応答文（be動詞を主語の前に出す）</h2>
+    <ol class="qa">
+      <li>
+        <span class="be">Are</span> you a member of the tennis club?
+        <span class="ans">— Yes, I am. / No, I'm not.</span>
+      </li>
+      <li>
+        <span class="be">Is</span> he your teacher?
+        <span class="ans">— Yes, he is. / No, he isn't.</span>
+      </li>
+      <li>
+        <span class="be">Is</span> this your umbrella?
+        <span class="ans">— Yes, it is. / No, it isn't.</span>
+      </li>
+      <li>
+        <span class="be">Are</span> they in the classroom?
+        <span class="ans">— Yes, they are. / No, they aren't.</span>
+      </li>
+      <li>
+        <span class="be">Was</span> the movie fun?
+        <span class="ans">— Yes, it was. / No, it wasn't.</span>
+      </li>
+      <li>
+        <span class="be">Were</span> you at the station?
+        <span class="ans">— Yes, I was. / No, I wasn't.</span>
+      </li>
+    </ol>
+    <p class="point">
+      <b>Are you ～?</b> と聞かれたら答えは <b>Yes, I am.</b>／主語が you → I
+      に変わるので注意！<br />
+      <b>this / that</b> で聞かれたら答えは <b>it</b> にする。（Is this ～? →
+      Yes, it is.）
+    </p>
+  </body>
+</html>
