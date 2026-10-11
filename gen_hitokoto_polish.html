@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>指導報告 一言メーカー</title>
+<style>
+:root{
+  --bg:#f4f1ea;
+  --card:#ffffff;
+  --ink:#25231e;
+  --muted:#6e685d;
+  --line:#e4ded2;
+  --line-strong:#d3ccbd;
+  --accent:#2f6f5e;
+  --accent-ink:#ffffff;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","YuGothic","Noto Sans JP",Meiryo,sans-serif;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  text-wrap:pretty;
+}
+.app{max-width:760px;margin:0 auto;padding:40px 20px 56px}
+.hd h1{font-size:26px;letter-spacing:.02em;margin:0 0 6px;font-weight:700}
+.hd .sub{margin:0 0 28px;color:var(--muted);font-size:14px}
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:22px 22px 8px;
+}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;letter-spacing:.02em;margin-bottom:7px}
+.field .opt{font-weight:400;color:var(--muted);font-size:12px;margin-left:4px}
+select,input[type=text]{
+  width:100%;
+  font:inherit;
+  font-size:15px;
+  color:var(--ink);
+  background:#fbfaf7;
+  border:1px solid var(--line-strong);
+  border-radius:9px;
+  padding:11px 12px;
+  appearance:none;
+}
+select{
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%236e685d' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat:no-repeat;
+  background-position:right 13px center;
+  padding-right:38px;
+  cursor:pointer;
+}
+select:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.out{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.out-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.out-title{font-size:13px;font-weight:700;letter-spacing:.02em}
+.btns{display:flex;gap:8px}
+button{
+  font:inherit;font-size:13px;font-weight:700;
+  color:var(--accent-ink);background:var(--accent);
+  border:1px solid var(--accent);border-radius:9px;
+  padding:9px 16px;cursor:pointer;
+}
+button:hover{filter:brightness(1.07)}
+button:active{transform:translateY(1px)}
+button.ghost{background:transparent;color:var(--muted);border-color:var(--line-strong)}
+button.ghost:hover{color:var(--ink);filter:none}
+textarea{
+  width:100%;min-height:132px;resize:vertical;
+  font:inherit;font-size:16px;line-height:1.9;color:var(--ink);
+  background:#fbfaf7;border:1px solid var(--line-strong);border-radius:9px;
+  padding:14px;display:block;
+}
+textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.status{min-height:20px;margin:8px 2px 0;font-size:12px;color:var(--accent);font-weight:700}
+.polish{margin-top:16px;padding-top:16px;border-top:1px dashed var(--line-strong)}
+.polish textarea{min-height:96px;background:#f6faf8}
+button.accent2{background:#7a5cc0;border-color:#7a5cc0}
+.ft{margin-top:22px;color:var(--muted);font-size:12px;text-align:center}
+@media (max-width:560px){
+  .app{padding:24px 14px 40px}
+  .hd h1{font-size:22px}
+  .out-head{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="hd">
+    <h1>指導報告 一言メーカー</h1>
+    <p class="sub">3つのプルダウンを選ぶと、保護者向けの一言が下に出ます。そのまま報告に添えてOK。</p>
+  </header>
+
+  <section class="panel">
+    <div class="field">
+      <label for="slot1">今回の姿・理解度</label>
+      <select id="slot1"></select>
+    </div>
+    <div class="field">
+      <label for="slot2">家庭学習の促し <span class="opt">任意</span></label>
+      <select id="slot2"></select>
+    </div>
+    <div class="field">
+      <label for="slot3">締め・励まし <span class="opt">任意</span></label>
+      <select id="slot3"></select>
+    </div>
+  </section>
+
+  <section class="out">
+    <div class="out-head">
+      <span class="out-title">できあがった一言</span>
+      <div class="btns">
+        <button id="polish" type="button" class="accent2">✨ 整える</button>
+        <button id="copy" type="button">コピー</button>
+        <button id="clear" type="button" class="ghost">クリア</button>
+      </div>
+    </div>
+    <textarea id="result" readonly placeholder="上のプルダウンを選ぶと、ここに一言が出ます。"></textarea>
+    <p id="status" class="status" aria-live="polite"></p>
+
+    <div id="polishWrap" class="polish" hidden>
+      <div class="out-head">
+        <span class="out-title">整えた案（Gemini）</span>
+        <div class="btns">
+          <button id="usePolished" type="button">これを使う</button>
+          <button id="discardPolished" type="button" class="ghost">元に戻す</button>
+        </div>
+      </div>
+      <textarea id="polished" readonly></textarea>
+    </div>
+  </section>
+
+  <footer class="ft">ストック文は「指導報告の一言ストック」より。</footer>
+</main>
+<script>
+// ストック文のデータ（「指導報告の一言ストック」より）
+const DATA = {
+  posture: [
+    { label: "A. 理解が早い・順調", items: [
+      "理解が早く、テンポよく進められました。",
+      "説明した内容をすぐに吸収できていました。",
+      "新しい単元にもすんなり入っていけていました。",
+      "これまでの積み重ねが効いていて、安定して解けています。",
+      "飲み込みが早く、この調子だと先へ先へ進めそうです。"
+    ]},
+    { label: "B. 自力で解けた・成長が見える", items: [
+      "ヒントを出すと、そこからは自力で解くことができていました。",
+      "以前は苦手にしていた問題にも、自分から取り組めていました。",
+      "一度間違えた問題を、次の類題では正解できていました。",
+      "考える力がついてきているのを感じます。",
+      "少しの声かけで、自分で動けるようになってきました。"
+    ]},
+    { label: "C. つまずき・苦戦（でも前向きに）", items: [
+      "今日は少し難しかったようですが、最後まで粘れていました。",
+      "苦戦はしていましたが、ヒントで気付くことができていました。",
+      "時間はかかりましたが、自分の力で答えにたどり着けました。",
+      "つまずいた分、次に活きる学びがあった回でした。",
+      "難しい問題にも、手を止めずに向き合えていました。"
+    ]},
+    { label: "D. ケアレスミス・もったいない", items: [
+      "考え方は合っていたので、ケアレスミスが減れば一気に伸びます。",
+      "もったいないミスが数問ありましたが、実力はついています。",
+      "見直しの習慣がつくと、得点が安定してきます。",
+      "焦らず落ち着いて解ければ、正答率は上がるはずです。",
+      "惜しい間違いが多かった分、伸び代は十分あります。"
+    ]},
+    { label: "E. 復習・定着が必要", items: [
+      "忘れていた公式があったので、覚え直しをしておきましょう。",
+      "解き方は理解できています。何度も練習を重ねて、いつでも解けるようにしていきましょう。",
+      "今回の単元は、家でも数問解いておくと次回スムーズです。",
+      "基礎は固まってきているので、次は演習量を増やしていきます。",
+      "一度できるようになっても、間をあけると忘れやすい単元です。"
+    ]},
+    { label: "F. 初めて・習いたての単元", items: [
+      "習いたての単元なので、まずは基礎を丁寧に確認しています。",
+      "新しい単元に入りました。まずは基本の形を覚えていきましょう。",
+      "初めて触れる内容でしたが、落ち着いて取り組めていました。",
+      "今は土台づくりの時期なので、ゆっくりで大丈夫です。"
+    ]},
+    { label: "G. テスト・模試のあと", items: [
+      "テストの解説を行い、注意すべき点を確認できました。",
+      "間違いの原因がはっきりしたので、次は同じミスを防げます。",
+      "解けなかった問題も、解説後は理解できていました。",
+      "まだ伸び代があります。次回に向けて一緒に整えていきましょう。",
+      "結果だけでなく、取れなかった問題の中身まで見ておくと次に活きます。"
+    ]}
+  ],
+  home: [
+    "お家では1日1問でいいので、続けてみてください。",
+    "次回までに今回の範囲の復習をお願いします。",
+    "家でも数問ずつ解いてみるよう話しています。",
+    "特にお家での課題はありません。この調子で大丈夫です。",
+    "短時間で構いませんので、毎日少しずつ触れる習慣がおすすめです。"
+  ],
+  closing: [
+    "小さな積み重ねが力になっています。",
+    "この調子なら、この先も安心して進めそうです。",
+    "焦らず、一緒に一歩ずつ進めていきましょう。",
+    "今日もよく頑張っていました。お声がけいただけたら嬉しいです。",
+    "次回もこの調子で取り組んでいきましょう。",
+    "ご家庭でのご協力に、いつも感謝しております。"
+  ]
+};
+
+const $ = (id) => document.getElementById(id);
+const slot1 = $("slot1"), slot2 = $("slot2"), slot3 = $("slot3");
+const result = $("result"), status = $("status");
+
+// セレクトを組み立てる。groups の各要素は {label, items}、label が無ければ optgroup なしで並べる。
+function fillSelect(sel, groups, placeholder){
+  sel.innerHTML = "";
+  if(placeholder !== null){
+    const o = document.createElement("option");
+    o.value = ""; o.textContent = placeholder;
+    sel.appendChild(o);
+  }
+  groups.forEach(function(g){
+    let parent = sel;
+    if(g.label){
+      const og = document.createElement("optgroup");
+      og.label = g.label;
+      sel.appendChild(og);
+      parent = og;
+    }
+    g.items.forEach(function(t){
+      const o = document.createElement("option");
+      o.value = t; o.textContent = t;
+      parent.appendChild(o);
+    });
+  });
+  sel.selectedIndex = 0;
+}
+
+// 選んだ3つを連結する
+function render(){
+  const parts = [];
+  if(slot1.value) parts.push(slot1.value);
+  if(slot2.value) parts.push(slot2.value);
+  if(slot3.value) parts.push(slot3.value);
+  result.value = parts.join("");
+  // 選択が変わったら「整えた案」は一旦引っ込める
+  if(polishWrap) polishWrap.hidden = true;
+}
+
+let statusTimer;
+function flash(msg){
+  status.textContent = msg;
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(function(){ status.textContent = ""; }, 1800);
+}
+
+// コピー：Clipboard API が使えなければ選択＋execCommand にフォールバック
+function copyText(){
+  const text = result.value.trim();
+  if(!text){ flash("まだ何も選ばれていません"); return; }
+  const fallback = function(){
+    try{
+      result.removeAttribute("readonly");
+      result.select();
+      result.setSelectionRange(0, result.value.length);
+      const ok = document.execCommand("copy");
+      result.setAttribute("readonly", "readonly");
+      window.getSelection().removeAllRanges();
+      flash(ok ? "コピーしました" : "コピーできませんでした。手動で選択してください");
+    }catch(e){
+      flash("コピーできませんでした。手動で選択してください");
+    }
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      flash("コピーしました");
+    }).catch(fallback);
+  }else{
+    fallback();
+  }
+}
+
+function clearAll(){
+  slot1.selectedIndex = 0;
+  slot2.selectedIndex = 0;
+  slot3.selectedIndex = 0;
+  render();
+  status.textContent = "";
+}
+
+fillSelect(slot1, DATA.posture, "▼ その回の様子を選ぶ");
+fillSelect(slot2, [{ items: DATA.home }], "なし");
+fillSelect(slot3, [{ items: DATA.closing }], "なし");
+[slot1, slot2, slot3].forEach(function(el){
+  el.addEventListener("change", render);
+  el.addEventListener("input", render);
+});
+// ============================================================
+// 「✨ 整える」：Gemini で言い換え
+// ------------------------------------------------------------
+// 下の WORKER_URL に、Cloudflare Worker の URL を入れてね。
+//   例: const WORKER_URL = "https://hitokoto-polish.xxxx.workers.dev";
+// 空のままだと「お試しモード」で、サンプルの整え文を返すよ。
+// ============================================================
+const WORKER_URL = "https://hitokoto-polish.fcmdm478.workers.dev/"; // ← ここに Worker の URL を入れる
+
+const polishWrap = $("polishWrap"), polished = $("polished");
+
+// お試しモード用のダミー応答（Worker 未設定でも UI の動きを確認できる）
+function mockPolish(text){
+  return text + "（※お試しモードのダミーです。Worker を繋ぐと本物の Gemini が整えます）";
+}
+
+async function polish(){
+  const text = result.value.trim();
+  if(!text){ flash("先に一言を作ってね"); return; }
+  flash("整えています…");
+  try{
+    let out;
+    if(!WORKER_URL){
+      // Worker 未設定 → お試しモード
+      await new Promise(function(r){ setTimeout(r, 500); });
+      out = mockPolish(text);
+    }else{
+      const res = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: text })
+      });
+      const data = await res.json();
+      if(!res.ok || !data.ok) throw new Error((data && data.error) ? data.error : ("HTTP " + res.status));
+      out = data.text;
+    }
+    polished.value = out;
+    polishWrap.hidden = false;
+    flash(WORKER_URL ? "整えました" : "お試しモード（Worker 未接続）");
+  }catch(e){
+    flash("整えに失敗しました: " + e.message);
+  }
+}
+
+$("polish").addEventListener("click", polish);
+$("usePolished").addEventListener("click", function(){
+  result.value = polished.value;
+  polishWrap.hidden = true;
+  flash("整えた案を採用しました");
+});
+$("discardPolished").addEventListener("click", function(){
+  polishWrap.hidden = true;
+  flash("元の文に戻しました");
+});
+
+$("copy").addEventListener("click", copyText);
+$("clear").addEventListener("click", clearAll);
+render();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
