@@ -77,6 +77,8 @@ textarea{
   padding:14px;display:block;
 }
 textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+/* 自由記入欄は 1〜2行のコンパクトな高さにする */
+.field textarea{min-height:56px;font-size:15px;line-height:1.7;padding:11px 12px}
 .status{min-height:20px;margin:8px 2px 0;font-size:12px;color:var(--accent);font-weight:700}
 .polish{margin-top:16px;padding-top:16px;border-top:1px dashed var(--line-strong)}
 .polish textarea{min-height:96px;background:#f6faf8}
@@ -108,6 +110,10 @@ button.accent2{background:#7a5cc0;border-color:#7a5cc0}
     <div class="field">
       <label for="slot3">締め・励まし <span class="opt">任意</span></label>
       <select id="slot3"></select>
+    </div>
+    <div class="field">
+      <label for="extra">自由記入 <span class="opt">任意</span></label>
+      <textarea id="extra" placeholder="例：次回は○○を扱います／○○の宿題を出しています"></textarea>
     </div>
   </section>
 
@@ -210,6 +216,7 @@ const DATA = {
 const $ = (id) => document.getElementById(id);
 const slot1 = $("slot1"), slot2 = $("slot2"), slot3 = $("slot3");
 const result = $("result"), status = $("status");
+const extra = $("extra");
 
 // セレクトを組み立てる。groups の各要素は {label, items}、label が無ければ optgroup なしで並べる。
 function fillSelect(sel, groups, placeholder){
@@ -242,6 +249,9 @@ function render(){
   if(slot1.value) parts.push(slot1.value);
   if(slot2.value) parts.push(slot2.value);
   if(slot3.value) parts.push(slot3.value);
+  // 自由記入欄の追記（あれば末尾に足す）
+  const ex = extra.value.trim();
+  if(ex) parts.push(ex);
   result.value = parts.join("");
   // 選択が変わったら「整えた案」は一旦引っ込める
   if(polishWrap) polishWrap.hidden = true;
@@ -284,6 +294,7 @@ function clearAll(){
   slot1.selectedIndex = 0;
   slot2.selectedIndex = 0;
   slot3.selectedIndex = 0;
+  extra.value = "";
   render();
   status.textContent = "";
 }
@@ -291,7 +302,7 @@ function clearAll(){
 fillSelect(slot1, DATA.posture, "▼ その回の様子を選ぶ");
 fillSelect(slot2, [{ items: DATA.home }], "なし");
 fillSelect(slot3, [{ items: DATA.closing }], "なし");
-[slot1, slot2, slot3].forEach(function(el){
+[slot1, slot2, slot3, extra].forEach(function(el){
   el.addEventListener("change", render);
   el.addEventListener("input", render);
 });
