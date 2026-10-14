@@ -131,7 +131,7 @@ button.accent2{background:#7a5cc0;border-color:#7a5cc0}
 
     <div id="polishWrap" class="polish" hidden>
       <div class="out-head">
-        <span class="out-title">整えた案（Gemini）</span>
+        <span class="out-title">整えた案（Sarashina）</span>
         <div class="btns">
           <button id="usePolished" type="button">これを使う</button>
           <button id="discardPolished" type="button" class="ghost">元に戻す</button>
@@ -307,7 +307,7 @@ fillSelect(slot3, [{ items: DATA.closing }], "なし");
   el.addEventListener("input", render);
 });
 // ============================================================
-// 「✨ 整える」：Gemini で言い換え
+// 「✨ 整える」：Sarashina で言い換え
 // ------------------------------------------------------------
 // 下の WORKER_URL に、Cloudflare Worker の URL を入れてね。
 //   例: const WORKER_URL = "https://hitokoto-polish.xxxx.workers.dev";
@@ -319,7 +319,7 @@ const polishWrap = $("polishWrap"), polished = $("polished");
 
 // お試しモード用のダミー応答（Worker 未設定でも UI の動きを確認できる）
 function mockPolish(text){
-  return text + "（※お試しモードのダミーです。Worker を繋ぐと本物の Gemini が整えます）";
+  return text + "（※お試しモードのダミーです。Worker を繋ぐと本物の Sarashina が整えます）";
 }
 
 async function polish(){
@@ -344,7 +344,7 @@ async function polish(){
     }
     polished.value = out;
     polishWrap.hidden = false;
-    flash(WORKER_URL ? "整えました" : "お試しモード（Worker 未接続）");
+    flash(WORKER_URL ? "整えました" : "お試しモード（中継サーバー未接続）");
   }catch(e){
     flash("整えに失敗しました: " + e.message);
   }
