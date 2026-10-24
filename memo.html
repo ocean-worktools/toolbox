@@ -65,6 +65,17 @@
         padding: 6px 10px;
         font-size: 0.85rem;
       }
+      /* メモごとのワンボタンコピー用ボタン */
+      button.copy {
+        background: #6a8;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        min-width: 68px; /* 「コピー済」に変わっても幅が動かないように固定 */
+      }
+      /* コピー成功の瞬間だけ色を変えてフィードバックする */
+      button.copy.done {
+        background: #2a8;
+      }
       button.sub {
         background: #888;
         font-size: 0.85rem;
@@ -151,6 +162,38 @@
         localStorage.setItem(KEY, JSON.stringify(memos));
       }
 
+      // メモ本文をクリップボードへコピーする
+      // 1) まずはモダンな Clipboard API を試す
+      // 2) file:// 直開きや http 環境、権限拒否のときは旧式の execCommand へフォールバック
+      async function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          try {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } catch (e) {
+            // 失敗したら下のフォールバックへ進む
+          }
+        }
+        // フォールバック: 画面外に textarea を作って全選択→コピー
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "-1000px";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, text.length); // iOS Safari 対策
+        let ok = false;
+        try {
+          ok = document.execCommand("copy");
+        } catch (e) {
+          ok = false;
+        }
+        document.body.removeChild(ta);
+        return ok;
+      }
+
       function render() {
         const q = searchEl.value.trim().toLowerCase();
         const shown = memos.filter((m) => m.text.toLowerCase().includes(q));
@@ -213,6 +256,20 @@
 
             const btns = document.createElement("div");
             btns.className = "btns";
+            // ワンボタンコピー（本文だけをコピー、日付は含めない）
+            const copyBtn = document.createElement("button");
+            copyBtn.className = "copy";
+            copyBtn.textContent = "コピー";
+            copyBtn.onclick = async () => {
+              const ok = await copyText(m.text);
+              // 成否をボタン自体に一瞬出して、押した手応えを作る
+              copyBtn.textContent = ok ? "コピー済" : "失敗";
+              copyBtn.classList.toggle("done", ok);
+              setTimeout(() => {
+                copyBtn.textContent = "コピー";
+                copyBtn.classList.remove("done");
+              }, 1200);
+            };
             const editBtn = document.createElement("button");
             editBtn.className = "edit";
             editBtn.textContent = "編集";
@@ -228,6 +285,7 @@
               save();
               render();
             };
+            btns.appendChild(copyBtn);
             btns.appendChild(editBtn);
             btns.appendChild(delBtn);
             li.appendChild(wrap);
@@ -304,5 +362,6 @@
 
       render();
     </script>
-  </body>
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
 </html>
